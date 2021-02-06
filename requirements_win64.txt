@@ -1,0 +1,2 @@
+python-magic==0.4.13
+python-magic-win64==0.4.13
