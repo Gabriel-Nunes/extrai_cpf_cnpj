@@ -8,7 +8,19 @@ from tkinter import filedialog
 from unicodedata import normalize
 
 
-def select_files():
+def choose_type():
+    return input('''
+        \nQual o tipo de arquivo que deseja extrair os CPFs/CNPJs?
+
+        1 - .pdf
+        2 - .docx
+        3 - sair
+
+        Digite a opcao desejada: 
+
+        ''')
+
+def select_files(doc_type):
     '''
     Abre janela gráfica para seleção de arquivos
     :return: lista com os 'paths' absolutos dos arquivos
@@ -16,7 +28,7 @@ def select_files():
     root = Tk()
     root.withdraw()
     root.filenames = filedialog.askopenfilenames(initialdir="/", title="Selecione os arquivos...",
-                                                filetypes=(("all files", "*.*"), ("all files", "*.*")))
+                                                filetypes=((f"{doc_type}", "*.*"), ("all files", "*.*")))
     return list(root.filenames)
 
 
@@ -26,7 +38,7 @@ def procura_cpf(text: str) -> list:
     :param text: str
     :return: list
     '''
-    regexCPF = re.compile(r'\d\d\d.?\d\d\d\.?\d\d\d-?\d\d')
+    regexCPF = re.compile(r'\D?\d\d\d.?\d\d\d\.?\d\d\d-?\d\d\D?')
     return [''.join([num for num in x if num.isalnum()]) for x in regexCPF.findall(text)]
 
 
@@ -36,5 +48,5 @@ def procura_cnpj(text: str) -> list:
     :param text: str
     :return: list
     '''
-    regexCNPJ = re.compile(r'\d\d.?\d\d\d\.?\d\d\d\/?\d\d\d\d-?\d\d')
+    regexCNPJ = re.compile(r'\D?\d\d.?\d\d\d\.?\d\d\d\/?\d\d\d\d-?\d\d\D?')
     return [''.join([num for num in x if num.isalnum()]) for x in regexCNPJ.findall(text)]
