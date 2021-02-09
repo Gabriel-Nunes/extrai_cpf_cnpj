@@ -8,3 +8,4 @@ dist/
 *.ico
 __pycache__/
 test/
+*.png
