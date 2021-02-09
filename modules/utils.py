@@ -28,7 +28,7 @@ def select_files(doc_type):
     root = Tk()
     root.withdraw()
     root.filenames = filedialog.askopenfilenames(initialdir="/", title="Selecione os arquivos...",
-                                                filetypes=((f"{doc_type}", "*.*"), ("all files", "*.*")))
+                                                filetypes=((f"{doc_type} files", f"{doc_type}"), ("all files", "*.*")))
     return list(root.filenames)
 
 
