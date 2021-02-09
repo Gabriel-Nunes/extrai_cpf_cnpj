@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 
-import csv
-import os
-import re
 from tkinter import *
 from tkinter import filedialog
-from unicodedata import normalize
+from validate_docbr import CPF, CNPJ
+import re
 
 
 def choose_type():
@@ -20,6 +18,7 @@ def choose_type():
 
         ''')
 
+
 def select_files(doc_type):
     '''
     Abre janela gráfica para seleção de arquivos
@@ -32,21 +31,33 @@ def select_files(doc_type):
     return list(root.filenames)
 
 
-def procura_cpf(text: str) -> set:
+def procura_cpf(text: str) -> list:
     '''
-    Retorna um conjunto com CPFs encontrados em uma string, somente com números.
+    Retorna uma lista com CPFs encontrados, somente com números.
     :param text: str
     :return: list
     '''
     regexCPF = re.compile(r'\b\d{11,11}\b|\b\d\d\d.\d\d\d.\d\d\d-\d\d\b')
-    return set([''.join([num for num in x if num.isalnum()]) for x in regexCPF.findall(text)])
+    cpfs = set([''.join([num for num in x if num.isalnum()]) for x in regexCPF.findall(text)])
+    valid_cpfs = []
+    for cpf in cpfs:
+        cpf_num = CPF()
+        if cpf_num.validate(cpf):
+            valid_cpfs.append(cpf)
+    return valid_cpfs
 
 
-def procura_cnpj(text: str) -> set:
+def procura_cnpj(text: str) -> list:
     '''
-    Retorna um conjunto com CNPJs encontrados em um texto, sem caracteres especiais.
+    Retorna uma lista com CNPJs válidos encontrados, somente com números.
     :param text: str
     :return: list
     '''
-    regexCNPJ = re.compile(r'\b\d{14,14}\b|\b\d\d.\d\d\d.\d\d\d\/\d\d\d\d-\d\d\b')
-    return set([''.join([num for num in x if num.isalnum()]) for x in regexCNPJ.findall(text)])
+    regexCPF = re.compile(r'\b\d{14,14}\b|\b\d\d.\d\d\d.\d\d\d\/\d\d\d\d-\d\d\b')
+    cnpjs = set([''.join([num for num in x if num.isalnum()]) for x in regexCPF.findall(text)])
+    valid_cnpjs = []
+    for cnpj in cnpjs:
+        cnpj_num = CNPJ()
+        if cnpj_num.validate(cnpj):
+            valid_cnpjs.append(cnpj)
+    return valid_cnpjs

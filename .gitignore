@@ -7,3 +7,4 @@ dist/
 *.spec
 *.ico
 __pycache__/
+test/
