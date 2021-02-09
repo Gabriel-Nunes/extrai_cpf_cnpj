@@ -25,7 +25,7 @@ Pode ser baixado e instalado em: "https://git-scm.com/downloads".
 
 4 - Ativar o ambiente virtual:
 
-    \*venv\Scripts\activate.bat\*
+    venv\Scripts\activate.bat
 
 5 - Instalar as dependências (somente na 1a vez):
 
