@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
-from modules.utils import select_files
 from modules.utils import procura_cnpj, procura_cpf, select_files, choose_type
 from pdfminer.high_level import extract_text
 import docx2txt
 import os
 import sys
-import xlsxwriter
+from tqdm import tqdm
 
 
 class Doc:
@@ -58,26 +57,26 @@ if __name__ == '__main__':
     cpf_results = []
     cnpj_results = []
 
-    for file in select_files(file_type[input_type]):
+    files = select_files(file_type[input_type])
+    print('\nLendo arquivos...\n')
+    for file in tqdm(files):
         doc = Doc(file, file_type[input_type])
-        cpf_results.append([procura_cpf(doc.get_text()), doc.filename])
-        cnpj_results.append([procura_cnpj(doc.get_text()), doc.filename])
+        text = doc.get_text()
+        cpfs = procura_cpf(text)
+        cnpjs = procura_cnpj(text)
+        for cpf in cpfs:
+            cpf_results.append(';'.join([cpf, doc.filename]))
+        for cnpj in cnpjs:
+            cnpj_results.append(';'.join([cnpj, doc.filename]))
 
-    # Create a workbook and add a worksheet to store cpfs.
-    workbook = xlsxwriter.Workbook('cpfs_encontrados.xlsx')
-    worksheet = workbook.add_worksheet()
+    # Create a .csv to store cpfs.
+    print('\nGravando CPFs...')
+    with open("cpfs_encontrados.csv", mode="a", newline='\n') as new_file:
+        for result in tqdm(cpf_results):
+            new_file.write(f'{result}\n')
 
-    # Iterate over the data and write it out row by row.
-    row = 0
-    col = 0
-    for cpf, file_name in (cpf_results):
-        worksheet.write(row, col, cpf)
-        worksheet.write(row, col + 1, file_name)
-        row += 1
-
-    row = 0
-    col = 0
-    for cnpj, file_name in (cnpj_results):
-        worksheet.write(row, col, cnpj)
-        worksheet.write(row, col + 1, file_name)
-        row += 1
+    # Create a .csv to store cnpjs.
+    print('\nGravando CNPJs...')
+    with open("cnpjs_encontrados.csv", mode="a", newline='\n') as new_file:
+        for result in tqdm(cnpj_results):
+            new_file.write(f'{result}\n')
