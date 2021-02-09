@@ -2,3 +2,8 @@
 venv/
 *.csv
 modules/__pycache__/
+build/
+dist/
+*.spec
+*.ico
+__pycache__/
