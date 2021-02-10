@@ -2,7 +2,7 @@
 
 Programa para extrair números de CPFs e CNPJs encontrados em documentos (.docx ou .pdf).
 
-Este programa recebe como entrada uma lista de arquivos no formato ".pdf" ou ".docx" e retorna, pesquisa CPFs e CNPJs nos arquivos e retorna os resultados em arquivos ".csv".
+Este programa recebe como entrada uma lista de arquivos no formato ".pdf" ou ".docx" re retorna, pesquisa CPFs e CNPJs nos arquivos e retorna os resultados em arquivos ".csv".
 
 Versão desenvolvida e testado no Windows 10.
 
@@ -10,7 +10,11 @@ Versão desenvolvida e testado no Windows 10.
     - Python3
 Pode ser baixado e instalado em: "https://www.python.org/download/releases/3.0/".
 
+* Certifique-se de adicionar o Python3 ao PATH do windows na instalação.
+
+
     - Git
+    
 Pode ser baixado e instalado em: "https://git-scm.com/downloads".
 # Instalação
 1 - No prompt de comando (cmd) do Windows, baixar o pacote do programa:
@@ -21,7 +25,11 @@ Pode ser baixado e instalado em: "https://git-scm.com/downloads".
     cd extrai_cpf_cnpj
 3 - Criar um ambiente virtual:
     
-    python3 -m venv venv
+    python3 -m venv venv 
+
+ou, se você não tiver outra versão do Python em sua máquina:
+
+    python -m venv venv
 
 4 - Ativar o ambiente virtual:
 
@@ -32,7 +40,10 @@ Pode ser baixado e instalado em: "https://git-scm.com/downloads".
     pip3 install -r requirements_win64.txt
 
 # Rodando o programa
-    python3 main.py
+    python3 extrai_cpf_cnpj.py
+ou, se você não tiver outra versão do Python em sua máquina:
+
+    python extrai_cpf_cnpj.py
 
 Escolher o tipo de arquivo onde estão os CPFs/CNPJs:
 
