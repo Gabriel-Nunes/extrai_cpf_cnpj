@@ -12,7 +12,8 @@ def choose_type():
 
         1 - .pdf
         2 - .docx
-        3 - sair
+        3 - .doc
+        4 - sair
 
         Digite a opcao desejada: 
 

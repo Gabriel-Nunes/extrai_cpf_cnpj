@@ -5,6 +5,7 @@ import docx2txt
 import os
 import sys
 from tqdm import tqdm
+import win32com.client
 
 
 class Doc:
@@ -26,6 +27,16 @@ class Doc:
                 self.text = docx2txt.process(self.path)
             except TypeError:
                 raise f"Erro ao ler o arquivo {0}. É um '.docx'?".format(self.filename)
+        elif self.type == '*.doc':
+            try:
+                word = win32com.client.Dispatch("Word.Application")
+                word.visible = False
+                word.Documents.Open(self.path)
+                doc = word.ActiveDocument
+                self.text = doc.Range().Text
+                word.Application.Quit()
+            except TypeError:
+                raise f"Erro ao ler o arquivo {0}. É um '.doc'?".format(self.filename)
 
     # Find CPFs on text
     def get_cpfs(self):
@@ -40,14 +51,14 @@ class Doc:
 
 if __name__ == '__main__':
     # Get the type of the files from user according to its extensions
-    file_type = {'1': '*.pdf', '2': '*.docx'}
+    file_type = {'1': '*.pdf', '2': '*.docx', '3': '*.doc'}
     input_type = choose_type()
 
     # Check the input [3 - leave program]
-    if input_type == '3':
+    if input_type == '4':
         sys.exit()
     # If the input option is not valid, ask again
-    elif input_type not in ['1', '2', '3']:
+    elif input_type not in ['1', '2', '3', '4']:
         choose_type()
 
     # Set the working directory to the current
