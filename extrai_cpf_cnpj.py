@@ -84,18 +84,20 @@ if __name__ == '__main__':
 
         # Save each CPF/CNPJ as a string (Ex: "81781726255;source_file.docx")
         for cpf in cpfs:
-            cpf_results.append(';'.join([cpf, doc.filename]))
+            cpf_results.append(';'.join([cpf, doc.filename, doc.path, doc.text.replace('\n', r'\n')]))
         for cnpj in cnpjs:
-            cnpj_results.append(';'.join([cnpj, doc.filename]))
+            cnpj_results.append(';'.join([cnpj, doc.filename, doc.path, doc.text.replace('\n', r'\n')]))
 
     # Create a .csv to store CPFs.
     print('\nGravando CPFs...')
     with open("cpfs_encontrados.csv", mode="a", newline='\n') as new_file:
+        new_file.write('cpf;arquivo;caminho;texto\n')
         for result in tqdm(cpf_results):
             new_file.write(f'{result}\n')
 
     # Create a .csv to store CNPJs.
     print('\nGravando CNPJs...')
     with open("cnpjs_encontrados.csv", mode="a", newline='\n') as new_file:
+        new_file.write('cnpj;arquivo;caminho;texto\n')
         for result in tqdm(cnpj_results):
             new_file.write(f'{result}\n')
