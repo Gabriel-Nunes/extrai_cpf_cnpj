@@ -2,7 +2,7 @@
 
 Programa para extrair números de CPFs e CNPJs encontrados em documentos (.docx ou .pdf).
 
-Este programa recebe como entrada uma lista de arquivos no formato ".pdf" ou ".docx" re retorna, pesquisa CPFs e CNPJs nos arquivos e retorna os resultados em arquivos ".csv".
+Este programa recebe como entrada uma lista de arquivos no formato ".pdf" ou ".docx" e retorna, pesquisa CPFs e CNPJs nos arquivos e retorna os resultados em arquivos ".csv".
 
 Versão desenvolvida e testado no Windows 10.
 
