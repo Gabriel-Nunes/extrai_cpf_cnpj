@@ -1,16 +1,17 @@
 # -*- coding: utf-8 -*-
 
-from tkinter import *
-from tkinter import filedialog
+from tkinter import Tk, filedialog
+# from tkinter import filedialog
 from validate_docbr import CPF, CNPJ
 import re
+import pandas as pd
 
 
 def choose_type():
     return input('''
         \nQual o tipo de arquivo que deseja extrair os CPFs/CNPJs?
 
-        1 - .pdf
+        1 - .pdf (somente PDFs "pesquisáveis")
         2 - .docx
         3 - .doc
         4 - sair
@@ -62,3 +63,20 @@ def procura_cnpj(text: str) -> list:
         if cnpj_num.validate(cnpj):
             valid_cnpjs.append(cnpj)
     return valid_cnpjs
+
+
+def to_table(file_path: str):
+    '''
+    Generate a html table of a given data file separeted by '|'
+    :param file: path of a file
+    :return: html file
+    '''
+    df = pd.read_csv(file_path, sep='|', encoding='latin1', names=['doc_num', 'arquivo', 'local', 'texto'])
+    file_name = f'{file_path}'.replace('.txt', '.html')
+    page = df.to_html()
+    new_page = re.sub(r'>(.{100,})?<', lambda pattern: pattern.group(0)[:300] + '...<', page)
+    with open(f'{file_name}', 'w') as file:
+        file.write(new_page)
+
+
+
