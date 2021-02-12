@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from modules.utils import procura_cnpj, procura_cpf, select_files, choose_type, to_table
+
+from modules.utils import procura_cnpj, procura_cpf, select_files, choose_type, to_table, show_exception_and_exit
 from pdfminer.high_level import extract_text
 import docx2txt
 import os
@@ -7,6 +8,7 @@ import re
 import sys
 from tqdm import tqdm
 import win32com.client
+from time import sleep
 
 
 class Doc:
@@ -54,73 +56,66 @@ class Doc:
 
 
 if __name__ == '__main__':
-
-    def show_exception_and_exit(exc_type, exc_value, tb):
-        '''
-        Avoid console screen shut down after errors.
-        '''
-        import traceback
-        traceback.print_exception(exc_type, exc_value, tb)
-        input("Pressione qualquer tecla para sair...")
-        sys.exit(-1)
-
-    sys.excepthook = show_exception_and_exit
-
-    # Get the type of the files from user according to its extensions
-    file_type = {'1': '*.pdf', '2': '*.docx', '3': '*.doc'}
     input_type = choose_type()
+    while True:
+        # Hook any exception avoiding close console
+        sys.excepthook = show_exception_and_exit
 
-    # Check the input [3 - leave program]
-    if input_type == '4':
-        exit()
-    # If the input option is not valid, ask again
-    elif input_type not in ['1', '2', '3', '4']:
-        choose_type()
+        # Get the type of the files from user according to its extensions
+        file_type = {'1': '*.pdf', '2': '*.docx', '3': '*.doc'}
 
-    # Lists to store final results
-    cpf_results = []
-    cnpj_results = []
+        # If the input option is not valid, ask again
+        if input_type not in ['1', '2', '3']:
+            choose_type()
 
-    # Open GUI window to user select the sources he wants to get CPFs/CNPJs
-    files = select_files(file_type[input_type])
+        # Lists to store final results
+        cpf_results = []
+        cnpj_results = []
 
-    # Set the working directory to the sources folder
-    BASE_PATH = os.path.dirname(files[0])
+        # Open GUI window to user select the sources he wants to get CPFs/CNPJs
+        files = select_files(file_type[input_type])
 
-    print('\nLendo arquivos...\n')
-    for file in tqdm(files):  # To each file selected
-        doc = Doc(os.path.abspath(file), file_type[input_type])  # Instantiate a Doc object
+        # Set the working directory to the sources folder
+        BASE_PATH = os.path.dirname(files[0])
 
-        # Store the file's text in one line
-        doc.get_text()
+        print('\nLendo arquivos...\n')
+        for file in tqdm(files):  # To each file selected
+            doc = Doc(os.path.abspath(file), file_type[input_type])  # Instantiate a Doc object
 
-        # Get file's valid CPFs/CNPJs
-        cpfs = procura_cpf(doc.text)
-        cnpjs = procura_cnpj(doc.text)
+            # Store the file's text in one line
+            doc.get_text()
 
-        # Save each CPF/CNPJ as a string (Ex: "81781726255|source_file.docx")
-        for cpf in cpfs:
-            cpf_results.append('|'.join([cpf, doc.filename, doc.path, f"\"{doc.text}\""]))
-        for cnpj in cnpjs:
-            cnpj_results.append('|'.join([cnpj, doc.filename, doc.path, f"\"{doc.text}\""]))
+            # Get file's valid CPFs/CNPJs
+            cpfs = procura_cpf(doc.text)
+            cnpjs = procura_cnpj(doc.text)
 
-    # Create a .txt to store CPFs.
-    print('\nGravando CPFs em .txt ...')
-    with open(os.path.join(f"{BASE_PATH}", "cpfs_encontrados.txt"), mode="a", newline='\n') as new_file:
-        # Write headers
-        # new_file.write('cpf\tarquivo\tcaminho\ttexto\n')
-        for result in tqdm(cpf_results):
-            new_file.write(f'{result}\n')
+            # Save each CPF/CNPJ as a string (Ex: "81781726255|source_file.docx")
+            for cpf in cpfs:
+                cpf_results.append('|'.join([cpf, doc.filename, doc.path, f"\"{doc.text}\""]))
+            for cnpj in cnpjs:
+                cnpj_results.append('|'.join([cnpj, doc.filename, doc.path, f"\"{doc.text}\""]))
 
-    # Create a .txt to store CNPJs.
-    print('\nGravando CNPJs ...')
-    with open(os.path.join(f"{BASE_PATH}", "cnpjs_encontrados.txt"), mode="a", newline='\n') as new_file:
-        # Write headers
-        # new_file.write('cnpj\tarquivo\tcaminho\ttexto\n')
-        for result in tqdm(cnpj_results):
-            new_file.write(f'{result}\n')
+        # Create a .txt to store CPFs.
+        print('\nGravando CPFs em .txt ...')
+        with open(os.path.join(f"{BASE_PATH}", "cpfs_encontrados.txt"), mode="a", newline='\n', encoding="utf-8") as new_file:
+            # Write headers
+            # new_file.write('cpf\tarquivo\tcaminho\ttexto\n')
+            for result in tqdm(cpf_results):
+                new_file.write(f'{result}\n')
 
-    # Generate html tables
-    print('\nGerando tabelas...')
-    to_table(os.path.join(f"{BASE_PATH}", "cpfs_encontrados.txt"))
-    to_table(os.path.join(f"{BASE_PATH}", "cnpjs_encontrados.txt"))
+        # Create a .txt to store CNPJs.
+        print('\nGravando CNPJs ...')
+        with open(os.path.join(f"{BASE_PATH}", "cnpjs_encontrados.txt"), mode="a", newline='\n', encoding="utf-8") as new_file:
+            # Write headers
+            # new_file.write('cnpj\tarquivo\tcaminho\ttexto\n')
+            for result in tqdm(cnpj_results):
+                new_file.write(f'{result}\n')
+
+        sleep(3)
+
+        # Generate html tables
+        print('\nGerando tabelas...')
+        to_table(os.path.join(f"{BASE_PATH}", "cpfs_encontrados.txt"))
+        to_table(os.path.join(f"{BASE_PATH}", "cnpjs_encontrados.txt"))
+
+        input_type = choose_type()

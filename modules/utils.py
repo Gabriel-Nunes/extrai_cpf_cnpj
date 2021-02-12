@@ -1,10 +1,41 @@
 # -*- coding: utf-8 -*-
 
 from tkinter import Tk, filedialog
-# from tkinter import filedialog
 from validate_docbr import CPF, CNPJ
 import re
 import pandas as pd
+import sys
+from charset_normalizer import CharsetNormalizerMatches as CnM
+from unicodedata import normalize
+
+def normaliza(txt):
+    """
+    Devolve cópia de uma str substituindo os caracteres
+    acentuados pelos seus equivalentes não acentuados.
+
+    Remove também espaços anteriores, posteriores e duplicados.
+
+    ATENÇÃO: caracteres gráficos não ASCII e não alfa-numéricos,
+    tais como bullets, travessões, aspas assimétricas, etc.
+    são simplesmente removidos!
+
+        >>> normaliza('[ACENTUAÇÃO] ç: áàãâä! éèêë? íìîï, óòõôö; úùûü.')
+        '[ACENTUACAO] c: aaaaa! eeee? iiii, ooooo; uuuu.'
+    """
+    result = normalize('NFKD', txt).encode('ASCII', 'ignore').decode('ASCII')
+    result.strip()
+    result = re.sub('\s{2,}', ' ', result)
+    return result
+
+
+def show_exception_and_exit(exc_type, exc_value, tb):
+    '''
+    Avoid console screen shut down after errors.
+    '''
+    import traceback
+    traceback.print_exception(exc_type, exc_value, tb)
+    input("\nPressione qualquer tecla para sair...")
+    sys.exit(-1)
 
 
 def choose_type():
@@ -14,7 +45,6 @@ def choose_type():
         1 - .pdf (somente PDFs "pesquisáveis")
         2 - .docx
         3 - .doc
-        4 - sair
 
         Digite a opcao desejada: 
 
@@ -71,12 +101,15 @@ def to_table(file_path: str):
     :param file: path of a file
     :return: html file
     '''
-    df = pd.read_csv(file_path, sep='|', encoding='latin1', names=['doc_num', 'arquivo', 'local', 'texto'])
+    df = pd.read_csv(file_path, sep='|', dtype=str, names=['doc_num', 'arquivo', 'local', 'texto'])
     file_name = f'{file_path}'.replace('.txt', '.html')
     page = df.to_html()
     new_page = re.sub(r'>(.{100,})?<', lambda pattern: pattern.group(0)[:300] + '...<', page)
-    with open(f'{file_name}', 'w') as file:
-        file.write(new_page)
-
-
+    try:
+        with open(f'{file_name}', 'w') as file:
+            file.write(new_page)
+    except UnicodeEncodeError:
+        with open(f'{file_name}', 'w') as file:
+            normalized_page = normaliza(page)
+            file.write(normalized_page)
 
